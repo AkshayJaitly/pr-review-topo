@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1f2328; width: 980px;
+  }
+  .hdr { border-bottom: 1px solid #d1d9e0; padding-bottom: 12px; margin-bottom: 4px; }
+  .hdr h1 { font-size: 22px; font-weight: 400; margin: 0 0 8px; }
+  .hdr h1 .num { color: #59636e; }
+  .badge { display: inline-block; background: #1a7f37; color: #fff; font-size: 12px;
+           font-weight: 600; padding: 4px 10px; border-radius: 20px; vertical-align: middle; }
+  .sub { color: #59636e; font-size: 14px; margin-top: 8px; }
+  .sub b { color: #1f2328; }
+
+  .order { background:#ddf4ff; border:1px solid #b6e3ff; border-radius:6px;
+           padding:10px 14px; font-size:13px; margin:16px 0; color:#0969da; }
+  .order code { background:#fff; border:1px solid #d1d9e0; border-radius:4px; padding:1px 5px; }
+
+  /* review summary card */
+  .review { border:1px solid #d1d9e0; border-radius:6px; margin:18px 0; overflow:hidden; }
+  .review .top { background:#f6f8fa; border-bottom:1px solid #d1d9e0; padding:10px 14px;
+                 font-size:13px; color:#59636e; }
+  .review .top b { color:#1f2328; }
+  .review .top .tag { color:#59636e; }
+  .review .body { padding:14px; font-size:14px; line-height:1.55; }
+  .review .body h3 { font-size:15px; margin:0 0 8px; }
+  .review .body ul { margin:8px 0 0; padding-left:20px; }
+  .review .body li { margin:4px 0; }
+
+  /* file diff blocks */
+  .file { border:1px solid #d1d9e0; border-radius:6px; margin:18px 0; overflow:hidden; }
+  .file .name { background:#f6f8fa; border-bottom:1px solid #d1d9e0; padding:8px 12px;
+                font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; }
+  .file .tagline { float:right; font-family:-apple-system,sans-serif; color:#59636e; font-weight:600; }
+  pre.code { margin:0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+             font-size:12px; line-height:1.5; }
+  .ln { display:flex; }
+  .ln .gut { width:42px; text-align:right; padding:0 8px; color:#59636e;
+             background:#f6f8fa; user-select:none; border-right:1px solid #eaeef2; }
+  .ln .txt { padding:0 10px; white-space:pre; flex:1; }
+  .add { background:#e6ffec; } .add .gut { background:#ccffd8; }
+  .ctx { background:#fff; }
+
+  /* inline comment thread */
+  .thread { border-top:1px solid #d1d9e0; background:#fff; padding:0; }
+  .comment { border:1px solid #d1d9e0; border-radius:6px; margin:12px; }
+  .comment .chead { background:#f6f8fa; border-bottom:1px solid #d1d9e0; padding:6px 12px;
+                    font-size:12.5px; color:#59636e; }
+  .comment .chead b { color:#1f2328; }
+  .comment .cbody { padding:10px 12px; font-size:13.5px; line-height:1.5; }
+  .comment .cbody code { background:#eff1f3; border-radius:4px; padding:1px 5px;
+                         font-family: ui-monospace, Menlo, monospace; font-size:12px; }
+  .sev-block { color:#cf222e; font-weight:700; }
+  .sev-nit { color:#9a6700; font-weight:700; }
+  .fix { background:#f6f8fa; border:1px solid #d1d9e0; border-radius:6px;
+         padding:8px 10px; margin-top:8px; font-family: ui-monospace, Menlo, monospace;
+         font-size:11.5px; white-space:pre; color:#1f2328; }
+  .cap { color:#59636e; font-size:12px; margin-top:24px; text-align:center; }
+</style>
+</head>
+<body>
+
+  <div class="hdr">
+    <h1>feat: request-scoped logging + ctx-aware auth <span class="num">#1</span></h1>
+    <span class="badge">● Open</span>
+    <span class="sub">&nbsp;&nbsp;<b>pr-review-topo</b> reviewed in dependency order &nbsp;·&nbsp; 2 blockers, 1 nit</span>
+  </div>
+
+  <div class="order">
+    🔀 Topological review order:
+    <code>pkg/util/log.go</code> → <code>pkg/auth/token.go</code> → <code>cmd/server/main.go</code>
+    &nbsp;(foundation → dependent)
+  </div>
+
+  <!-- Review summary -->
+  <div class="review">
+    <div class="top"><b>pr-review-topo</b> <span class="tag">left a review · commented</span></div>
+    <div class="body">
+      <h3>pr-review-topo: dependency-ordered review</h3>
+      Reviewed foundation-first: <b>log.go → token.go → main.go</b>. Recommendation: <b>request changes</b>.
+      <ul>
+        <li>🔴 <code>token.go</code> — <code>Validate</code> accepts any structurally-valid token: expiry never checked, signature is a TODO.</li>
+        <li>🔴 <code>main.go</code> — handler passes <code>context.Background()</code> instead of <code>r.Context()</code>, so request-scoped logging can never carry a request id. Only obvious <i>because</i> log.go was reviewed first.</li>
+        <li>🟡 <code>log.go</code> — <code>InfoCtx</code> silently degrades when ctx has no request id, and nothing in this PR calls <code>WithRequestID</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- File 1: log.go -->
+  <div class="file">
+    <div class="name">pkg/util/log.go <span class="tagline">1 · foundation — depended on by token.go, main.go</span></div>
+    <pre class="code"><div class="ln add"><span class="gut">14</span><span class="txt">func (l *Logger) InfoCtx(ctx context.Context, msg string) {</span></div><div class="ln add"><span class="gut">15</span><span class="txt">    rid, _ := ctx.Value(reqIDKey).(string)</span></div><div class="ln add"><span class="gut">16</span><span class="txt">    if rid != "" {</span></div></pre>
+    <div class="thread">
+      <div class="comment">
+        <div class="chead"><b>pr-review-topo</b> commented on line 14</div>
+        <div class="cbody">
+          <span class="sev-nit">🟡 nit (foundation):</span> <code>InfoCtx</code> falls back to the unscoped
+          format when ctx carries no request id. Reasonable, but it fails <i>silently</i> — a miswired caller looks fine.
+          Nothing in this PR calls <code>WithRequestID</code>, so no id is ever seeded. Flagging here because it
+          determines whether the consumers below actually work.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File 2: token.go -->
+  <div class="file">
+    <div class="name">pkg/auth/token.go <span class="tagline">2 · depended on by main.go</span></div>
+    <pre class="code"><div class="ln ctx"><span class="gut">22</span><span class="txt">    }</span></div><div class="ln add"><span class="gut">23</span><span class="txt">    // TODO: verify signature</span></div><div class="ln add"><span class="gut">24</span><span class="txt">    return true</span></div></pre>
+    <div class="thread">
+      <div class="comment">
+        <div class="chead"><b>pr-review-topo</b> commented on line 24</div>
+        <div class="cbody">
+          <span class="sev-block">🔴 blocker (security):</span> the docstring promises
+          <code>&lt;userid&gt;:&lt;exp-unix&gt;:&lt;sig&gt;</code>, but the body only checks that 3 fields exist —
+          the expiry is never compared to <code>time.Now()</code> and the signature is a <code>// TODO</code>.
+          So <b>any well-shaped string authenticates</b>, and expired/forged tokens are accepted indefinitely.
+          <div class="fix">exp, err := strconv.ParseInt(parts[1], 10, 64)
+if err != nil || time.Now().Unix() &gt; exp {
+    return false
+}
+// verify signature before returning true</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File 3: main.go -->
+  <div class="file">
+    <div class="name">cmd/server/main.go <span class="tagline">3 · top consumer</span></div>
+    <pre class="code"><div class="ln ctx"><span class="gut">14</span><span class="txt">    http.HandleFunc("/check", func(w http.ResponseWriter, r *http.Request) {</span></div><div class="ln add"><span class="gut">15</span><span class="txt">        ctx := context.Background()</span></div><div class="ln ctx"><span class="gut">16</span><span class="txt">        tok := r.Header.Get("Authorization")</span></div></pre>
+    <div class="thread">
+      <div class="comment">
+        <div class="chead"><b>pr-review-topo</b> commented on line 15</div>
+        <div class="cbody">
+          <span class="sev-block">🔴 blocker:</span> <code>context.Background()</code> is passed to
+          <code>auth.Validate</code> and <code>log.InfoCtx</code> instead of the request's own context.
+          Because <code>InfoCtx</code> (reviewed first) only emits a request id when the ctx carries one, and
+          <code>context.Background()</code> is always empty, <b>request correlation can never work</b> — every
+          log line drops to <code>[server] ok</code> with no id. The feature this PR exists to add is dead on arrival.
+          <div class="fix">ctx := r.Context()  // + middleware that calls util.WithRequestID</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cap">Rendered from the real review posted on github.com/AkshayJaitly/topo-pr-review-demo/pull/1</div>
+
+</body>
+</html>

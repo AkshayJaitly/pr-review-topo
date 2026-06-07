@@ -5,6 +5,17 @@ request in **topological (dependency) order** — foundational files first,
 dependents last — so each file is reviewed with full context of everything it
 builds on.
 
+## What a review looks like
+
+A real review produced by this skill, posted as inline comments on a GitHub PR
+in topological order (foundation → dependent):
+
+![pr-review-topo review](docs/pr-review-screenshot.png)
+
+More diagrams — workflow, dependency graph, cycle handling, and the
+review-order sequence — are in **[docs/diagrams.md](docs/diagrams.md)**.
+Live example: https://github.com/AkshayJaitly/topo-pr-review-demo/pull/1
+
 ## Why
 
 A change in file B is hard to judge before you've seen how its dependency A
