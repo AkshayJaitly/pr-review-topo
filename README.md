@@ -8,9 +8,18 @@ builds on.
 ## What a review looks like
 
 A real review produced by this skill, posted as inline comments on a GitHub PR
-in topological order (foundation → dependent):
+in topological order (foundation → dependent). Note the file tree — every
+changed file (`main.go`, `token.go`, `log.go`) carries a comment, and the
+`context.Background()` blocker is anchored right on line R15:
 
-![pr-review-topo review](docs/pr-review-screenshot.png)
+![pr-review-topo review on GitHub](docs/pr-review-github.png)
+
+<details>
+<summary>Full annotated view (all three findings in order)</summary>
+
+![annotated review](docs/pr-review-screenshot.png)
+
+</details>
 
 More diagrams — workflow, dependency graph, cycle handling, and the
 review-order sequence — are in **[docs/diagrams.md](docs/diagrams.md)**.
