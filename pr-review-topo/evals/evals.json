@@ -1,0 +1,41 @@
+{
+  "skill_name": "pr-review-topo",
+  "evals": [
+    {
+      "id": 0,
+      "name": "go-auth-ctx-propagation",
+      "prompt": "I have a feature branch in /Users/anju/Documents/App/skills/pr-review-topo-workspace/fixtures/fixture-go-auth — please review the changes against `main`. It's a Go web service. Give me a code review report — what's good, what should change, blockers vs nits.",
+      "expected_output": "Reviews in dependency order, finds the unfinished signature TODO blocker and the ctx.Background() bug in main.go.",
+      "files": [],
+      "assertions": [
+        "Reviews files in dependency order: pkg/util/log.go is reviewed before pkg/auth/token.go, which is reviewed before cmd/server/main.go.",
+        "Flags the missing token signature verification (the TODO in auth.Validate) — the function returns true for any well-shaped token, which is a security blocker.",
+        "Flags that cmd/server/main.go passes context.Background() to auth.Validate / log.InfoCtx instead of r.Context(), defeating the new request-scoped logging.",
+        "Calls out that log.InfoCtx without a request id in ctx degrades silently to the unscoped format (acceptable design choice, but worth noting)."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "py-pipeline-keyword-only-break",
+      "prompt": "Review the feature branch in /Users/anju/Documents/App/skills/pr-review-topo-workspace/fixtures/fixture-py-pipeline against main. Tell me whether it's ready to merge.",
+      "expected_output": "Reviews io.py first, catches that transform.py still calls read_data positionally and will TypeError at runtime.",
+      "files": [],
+      "assertions": [
+        "Reviews files in dependency order: pipeline/io.py before pipeline/transform.py before pipeline/main.py.",
+        "Flags the broken call `read_data(path, ',')` in transform.py — sep is now keyword-only, so this raises TypeError at runtime. Must be marked as a blocker or merge-blocker.",
+        "Recommends against merging or explicitly requests changes."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "cycle-stale-attribute",
+      "prompt": "Please code-review the changes on the `feature` branch of /Users/anju/Documents/App/skills/pr-review-topo-workspace/fixtures/fixture-cycle compared to main.",
+      "expected_output": "Detects the import cycle, reviews user.py and group.py as a unit, flags the stale `user.groups` reference.",
+      "files": [],
+      "assertions": [
+        "Detects the cyclic import between models/user.py and models/group.py and reviews them together (or explicitly notes the cycle).",
+        "Flags that group.py's `members_with_group` still reads `user.groups`, but user.py renamed that attribute to `group_ids` — this is an AttributeError at runtime. Must be a blocker."
+      ]
+    }
+  ]
+}

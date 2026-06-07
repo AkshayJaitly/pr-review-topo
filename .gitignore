@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.DS_Store
+# generated fixture repos — recreate with workspace/fixtures/build_fixtures.sh
+workspace/fixtures/fixture-*/

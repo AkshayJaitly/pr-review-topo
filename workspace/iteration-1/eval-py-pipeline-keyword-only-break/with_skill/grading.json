@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Reviews files in dependency order: pipeline/io.py before pipeline/transform.py before pipeline/main.py.",
+      "passed": true,
+      "evidence": "Section headers 1./2./3. follow io.py → transform.py → main.py order. Summary explicitly states the topological order."
+    },
+    {
+      "text": "Flags the broken call `read_data(path, ',')` in transform.py — sep is now keyword-only, so this raises TypeError at runtime. Must be marked as a blocker or merge-blocker.",
+      "passed": true,
+      "evidence": "transform.py section marks it as 'blocker' with TypeError message and a one-line fix."
+    },
+    {
+      "text": "Recommends against merging or explicitly requests changes.",
+      "passed": true,
+      "evidence": "Summary: 'Recommendation: request changes.'"
+    }
+  ]
+}

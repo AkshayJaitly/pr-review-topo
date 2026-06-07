@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "go-auth-ctx-propagation",
+  "prompt": "I have a feature branch in /Users/anju/Documents/App/skills/pr-review-topo-workspace/fixtures/fixture-go-auth — please review the changes against `main`. It's a Go web service. Give me a code review report — what's good, what should change, blockers vs nits.",
+  "assertions": []
+}

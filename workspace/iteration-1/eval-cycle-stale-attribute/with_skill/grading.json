@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "Detects the cyclic import between models/user.py and models/group.py and reviews them together (or explicitly notes the cycle).",
+      "passed": true,
+      "evidence": "Summary states 'Topological order used: models/group.py ↔ models/user.py (cycle — reviewed as one unit)'. Dedicated 'Cycle note' section explains the SCC detection."
+    },
+    {
+      "text": "Flags that group.py's `members_with_group` still reads `user.groups`, but user.py renamed that attribute to `group_ids` — this is an AttributeError at runtime. Must be a blocker.",
+      "passed": true,
+      "evidence": "Line 32: 'blocker: stale attribute name + type mismatch in members_with_group'. Provides the corrected code."
+    }
+  ]
+}

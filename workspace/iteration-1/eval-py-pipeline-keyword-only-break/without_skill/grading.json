@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Reviews files in dependency order: pipeline/io.py before pipeline/transform.py before pipeline/main.py.",
+      "passed": false,
+      "evidence": "Files reviewed in order: main.py, transform.py, io.py — reverse of dependency order. transform.py section called the change 'mostly cosmetic' and missed the broken positional call entirely because the keyword-only constraint from io.py was not yet known."
+    },
+    {
+      "text": "Flags the broken call `read_data(path, ',')` in transform.py — sep is now keyword-only, so this raises TypeError at runtime. Must be marked as a blocker or merge-blocker.",
+      "passed": false,
+      "evidence": "Bug entirely missed. transform.py section called the change 'No behavior change. Fine.' This is the kind of bug topo ordering is designed to catch."
+    },
+    {
+      "text": "Recommends against merging or explicitly requests changes.",
+      "passed": false,
+      "evidence": "Recommended 'approve with minor changes' — would have merged a branch that TypeErrors at runtime."
+    }
+  ]
+}

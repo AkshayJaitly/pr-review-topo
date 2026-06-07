@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "Detects the cyclic import between models/user.py and models/group.py and reviews them together (or explicitly notes the cycle).",
+      "passed": true,
+      "evidence": "Mentions 'circular import is unchanged' and reviews both files coherently — with only 2 files it's natural to consider them together. Doesn't use the word 'SCC' but understands the relationship."
+    },
+    {
+      "text": "Flags that group.py's `members_with_group` still reads `user.groups`, but user.py renamed that attribute to `group_ids` — this is an AttributeError at runtime. Must be a blocker.",
+      "passed": true,
+      "evidence": "'Critical Bug: Stale Attribute Reference in Group.members_with_group()' — same fix proposed."
+    }
+  ]
+}

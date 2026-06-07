@@ -1,0 +1,6 @@
+{
+  "eval_id": 2,
+  "eval_name": "cycle-stale-attribute",
+  "prompt": "Please code-review the changes on the `feature` branch of /Users/anju/Documents/App/skills/pr-review-topo-workspace/fixtures/fixture-cycle compared to main.",
+  "assertions": []
+}

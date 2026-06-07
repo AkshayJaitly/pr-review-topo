@@ -1,0 +1,24 @@
+{
+  "expectations": [
+    {
+      "text": "Reviews files in dependency order: pkg/util/log.go is reviewed before pkg/auth/token.go, which is reviewed before cmd/server/main.go.",
+      "passed": false,
+      "evidence": "File sections appear in the order: cmd/server/main.go, pkg/auth/token.go, pkg/util/log.go — i.e. the reverse of dependency order. Reviewing main.go first leads to phrasing the ctx.Background() observation as a tentative 'question' rather than a blocker."
+    },
+    {
+      "text": "Flags the missing token signature verification (the TODO in auth.Validate) — the function returns true for any well-shaped token, which is a security blocker.",
+      "passed": true,
+      "evidence": "Mentions 'returns true for any structurally-valid token regardless of signature' and 'security regression'."
+    },
+    {
+      "text": "Flags that cmd/server/main.go passes context.Background() to auth.Validate / log.InfoCtx instead of r.Context(), defeating the new request-scoped logging.",
+      "passed": false,
+      "evidence": "Raised only as a 'question' ('is there a reason...?'), not flagged as a blocker. Without reviewing log.go first the reviewer was less sure that this was a clear bug."
+    },
+    {
+      "text": "Calls out that log.InfoCtx without a request id in ctx degrades silently to the unscoped format (acceptable design choice, but worth noting).",
+      "passed": true,
+      "evidence": "Notes 'unless a middleware does it elsewhere, the request id field will always be empty and InfoCtx will silently behave like Info.'"
+    }
+  ]
+}
